@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="l2fprod-common-all">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/l2fprod-common-all.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

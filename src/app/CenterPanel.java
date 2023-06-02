@@ -11,7 +11,14 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+
+import com.l2fprod.common.swing.JButtonBar;
 import org.freixas.jcalendar.JCalendarCombo;
+import com.l2fprod.common.swing.plaf.ButtonBarButtonUI;
+//import com.l2fprod.common.swing.plaf.JButtonBar;
+import com.l2fprod.common.swing.plaf.JButtonBarAddon;
+import com.l2fprod.common.swing.plaf.basic.BasicButtonBarUI;
+
 
 
 public class CenterPanel extends JPanel implements ActionListener {
@@ -28,6 +35,8 @@ public class CenterPanel extends JPanel implements ActionListener {
     private TitledBorder titledBorder;
     private Border blackLine;
     private static JSpinner spinnerRow, spinnerCol;
+
+    private static IntegerTableModel integerModel;
 
     private Object[][] data = {
             {(float)0,(float)0,(float)0,(float)0,(float)0},
@@ -107,6 +116,15 @@ public class CenterPanel extends JPanel implements ActionListener {
         listaButton = new JButton("Oblicz");
         listaButton.addActionListener(this);
 
+        JButtonBar buttonBar = new JButtonBar(JButtonBar.VERTICAL);
+        buttonBar.add(dodajButton);
+        buttonBar.add(wyzerujButton);
+        buttonBar.add(wypelnijButton);
+        buttonBar.add(listaButton);
+        buttonBar.add(saveButton);
+
+
+
         // utworzenie instacji obiektu JCalendar
         jccData = new JCalendarCombo(
                 Calendar.getInstance(),
@@ -117,7 +135,11 @@ public class CenterPanel extends JPanel implements ActionListener {
         // ustawienie formatu daty
         jccData.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
 
-        table = new JTable(data, nazwyKolumn);
+        //table = new JTable(data, nazwyKolumn);
+
+        integerModel = new IntegerTableModel();
+
+        table = new JTable(integerModel);
 
         jp.add(paramLabel);
         jp.add(paramTextField);
@@ -126,13 +148,14 @@ public class CenterPanel extends JPanel implements ActionListener {
         jp.add(spinnerCol);
         jp.add(paramLabel2);
         jp.add(table);
-        jp.add(dodajButton);
-        jp.add(wyzerujButton);
-        jp.add(wypelnijButton);
-        jp.add(saveButton);
+        //jp.add(dodajButton);
+       //jp.add(wyzerujButton);
+//        jp.add(wypelnijButton);
+//        jp.add(saveButton);
         jp.add(listaLabel);
         jp.add(lista);
-        jp.add(listaButton);
+        jp.add(buttonBar);
+//        jp.add(listaButton);
         return jp;
     }
     /**
@@ -193,7 +216,7 @@ public class CenterPanel extends JPanel implements ActionListener {
         String inputText = paramTextField.getText();
         try{
             float inputNumber = Float.parseFloat(inputText);
-            table.getModel().setValueAt(inputNumber, ((Integer)spinnerRow.getValue())-1, ((Integer)spinnerCol.getValue())-1);
+            integerModel.setValue(inputNumber, ((Integer)spinnerRow.getValue())-1, ((Integer)spinnerCol.getValue())-1);
             resultTextArea.append("Wartość "+inputNumber+" została wpisana do komórki w: "+((Integer)spinnerRow.getValue()) + " k: " + ((Integer)spinnerCol.getValue()) +"\n");
         } catch (NumberFormatException ex){
             JOptionPane.showMessageDialog(null,"wprowadzona wartość nie jest liczbą","Błąd", JOptionPane.WARNING_MESSAGE);
@@ -201,21 +224,12 @@ public class CenterPanel extends JPanel implements ActionListener {
     }
 
     static void clearTable(){
-        for(int w=0; w<5; w++){
-            for(int k=0; k<5; k++){
-                table.getModel().setValueAt((float)0, w, k);
-            }
-        }
+        integerModel.setZeroTable();
         resultTextArea.append("Tabela została wyzerowana\n");
     }
 
     static void fillTable(){
-        Random rand = new Random();
-        for(int w=0; w<5; w++){
-            for(int k=0; k<5; k++){
-                table.getModel().setValueAt(((float)rand.nextInt(100)), w, k);
-            }
-        }
+        integerModel.setRandomTable();
         resultTextArea.append("Tabela została wypełniona losowymi wartościami\n");
     }
 
@@ -257,13 +271,7 @@ public class CenterPanel extends JPanel implements ActionListener {
     }
 
     static void summedValue(){
-        float bufor = 0;
-
-        for(int w=0; w<5; w++){
-            for(int k=0; k<5; k++){
-                bufor += ((float)table.getModel().getValueAt(w,k));
-            }
-        }
+        float bufor = integerModel.calculateSum();
         resultTextArea.append("Suma wartości: "+bufor+"\n");
     }
 
