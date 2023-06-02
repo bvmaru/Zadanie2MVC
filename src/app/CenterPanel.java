@@ -14,6 +14,12 @@ import javax.swing.border.TitledBorder;
 
 import com.l2fprod.common.swing.JButtonBar;
 import org.freixas.jcalendar.JCalendarCombo;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.statistics.HistogramDataset;
 import com.l2fprod.common.swing.plaf.ButtonBarButtonUI;
 //import com.l2fprod.common.swing.plaf.JButtonBar;
 import com.l2fprod.common.swing.plaf.JButtonBarAddon;
@@ -28,7 +34,7 @@ public class CenterPanel extends JPanel implements ActionListener {
     private static JTextField paramTextField;
     private static JTextArea resultTextArea;
     private JLabel paramLabel, paramLabel1, paramLabel2, listaLabel;
-    private JButton dodajButton, wyzerujButton, wypelnijButton, saveButton, listaButton;
+    private JButton dodajButton, wyzerujButton, wypelnijButton, saveButton, listaButton, dateButton, chartButton;
     // deklaracja zmiennej typu JCalendarCombo o nazwie jccData
     private JCalendarCombo jccData;
     private static JTable table;   //static do testów
@@ -110,11 +116,15 @@ public class CenterPanel extends JPanel implements ActionListener {
         wypelnijButton.addActionListener(this);
         saveButton = new JButton("Zapisz");
         saveButton.addActionListener(this);
+        chartButton = new JButton("Wykres");
+        chartButton.addActionListener(this);
         listaLabel = new JLabel("Wybierz operację");
         lista = new JList(obliczenia);
         lista.setBackground(Color.lightGray.brighter());
         listaButton = new JButton("Oblicz");
         listaButton.addActionListener(this);
+        dateButton = new JButton("Wybierz datę");
+        dateButton.addActionListener(this);
 
         JButtonBar buttonBar = new JButtonBar(JButtonBar.VERTICAL);
         buttonBar.add(dodajButton);
@@ -122,6 +132,7 @@ public class CenterPanel extends JPanel implements ActionListener {
         buttonBar.add(wypelnijButton);
         buttonBar.add(listaButton);
         buttonBar.add(saveButton);
+        buttonBar.add(chartButton);
 
 
 
@@ -155,6 +166,8 @@ public class CenterPanel extends JPanel implements ActionListener {
         jp.add(listaLabel);
         jp.add(lista);
         jp.add(buttonBar);
+        jp.add(jccData);
+        jp.add(dateButton);
 //        jp.add(listaButton);
         return jp;
     }
@@ -202,6 +215,24 @@ public class CenterPanel extends JPanel implements ActionListener {
             } else if (lista.getSelectedValue() == obliczenia[3]) {
                 maxValue();
             }
+        } else if(ae.getSource() == dateButton) {
+            String param = paramTextField.getText();
+            // Pobranie daty do obiektu typu String
+            // Miesiace liczone sa od 0 wiec trzeba dodac 1
+            Calendar cal = jccData.getCalendar();
+            String data = ""+cal.get(Calendar.YEAR)+"-";
+            int miesiac = cal.get(Calendar.MONTH)+1;
+            if(miesiac <= 9) data = data+"0"+String.valueOf(miesiac)+"-";
+            else data = data+String.valueOf(miesiac)+"-";
+            int dzien = cal.get(Calendar.DAY_OF_MONTH);
+            if(dzien <= 9) data = data+"0"+String.valueOf(dzien);
+            else data = data+String.valueOf(dzien);
+
+            // zapisanie danych w polu TextArea
+            resultTextArea.append("Parametr: "+param+"\n");
+            resultTextArea.append("Data: "+data+"\n");
+        } else if (ae.getSource() == chartButton) {
+            drawChart();
         }
     }
     /**
@@ -273,6 +304,51 @@ public class CenterPanel extends JPanel implements ActionListener {
     static void summedValue(){
         float bufor = integerModel.calculateSum();
         resultTextArea.append("Suma wartości: "+bufor+"\n");
+    }
+
+    static void drawChart(){
+        double data [] = new double[25];
+        int i = 0;
+        for(int w=0; w<5; w++){
+            for(int k=0; k<5; k++){
+                data[i] =(float)table.getModel().getValueAt(w,k);
+                i++;
+            }
+        }
+
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.addSeries("Histogram", data, 10); // Drugi parametr to liczba koszyków (bins)
+
+        // Tworzenie histogramu
+        JFreeChart chart = ChartFactory.createHistogram(
+                "Histogram", // Tytuł wykresu
+                "Wartość", // Etykieta osi X
+                "Liczba obserwacji", // Etykieta osi Y
+                dataset, // Zestaw danych
+                PlotOrientation.HORIZONTAL, // Orientacja wykresu
+                true, // Czy wyświetlać legendę
+                true, // Czy wygenerować narzędzia wykresu
+                false // Czy wygenerować adres URL w przypadku kliknięcia w wykres
+        );
+
+        // Konfiguracja wyglądu histogramu
+        chart.setBackgroundPaint(Color.WHITE);
+        chart.getPlot().setBackgroundPaint(Color.WHITE);
+
+        // Tworzenie okna z wykresem histogramu
+        ChartFrame frame = new ChartFrame("Histogram", chart);
+
+        // Ustawienie preferowanej wielkości okna
+        frame.setPreferredSize(new Dimension(600, 400));
+
+        // Wyśrodkowanie okna na ekranie
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int centerX = (screenSize.width - frame.getWidth()) / 2;
+        int centerY = (screenSize.height - frame.getHeight()) / 2;
+        frame.setLocation(centerX, centerY);
+
+        frame.pack();
+        frame.setVisible(true);
     }
 
     static void saveToFile(){

@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="jcalendar" level="project" />
     <orderEntry type="library" name="l2fprod-common-all" level="project" />
+    <orderEntry type="library" name="jfreechart-1.5.4" level="project" />
   </component>
 </module>
