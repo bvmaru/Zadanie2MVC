@@ -1,9 +1,14 @@
 package app;
 
+import com.l2fprod.common.swing.JTipOfTheDay;
+import com.l2fprod.common.swing.tips.DefaultTip;
+import com.l2fprod.common.swing.tips.DefaultTipModel;
+
 import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.awt.event.*;
+import java.util.Random;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -297,6 +302,30 @@ public class MyWindow extends JFrame implements ActionListener, Runnable {
         }
     }
 
+    private static void tipOfTheDay(){
+        Random rand = new Random();
+        DefaultTipModel spis_porad = new DefaultTipModel();
+        spis_porad.add(new DefaultTip("Nietzsche1", "Kiedy spoglądasz w otchłań ona również patrzy na ciebie."));
+        spis_porad.add(new DefaultTip("Kant","Imperatyw kategoryczny – zasada etyczna, którą można sformułować" +
+                " na wiele sposobów, w tym w sposób następujący: „należy postępować zawsze wedle takich reguł, co do których" +
+                " chcielibyśmy, aby były one stosowane przez każdego i zawsze”."));
+        spis_porad.add(new DefaultTip("Nietzsche2", "Patrz, jak każda z twych cnót najwyższego pożąda: chce ona" +
+                " całego ducha twego, aby był jej heroldem, chce całej twej siły w gniewie, nienawiści i miłowaniu."));
+        spis_porad.add(new DefaultTip("Mann2", "Pustka i monotonia mogą wprawdzie sprawić, że chwila i godzina rozciąga się " +
+                "i \"dłuży\", ale sprawiają też, że długie i najdłuższe okresy czasu skracają się, a nawet ulatniają aż do zupełnej nicości."));
+        spis_porad.add(new DefaultTip("Nietzsche3", "Radzęż ja wam, abyście zabili w sobie zmysły? Ja wam doradzam zmysłów niewinność!"));
+        spis_porad.add(new DefaultTip("Proust", "... i w swoim głodzie szczęścia nie żądać od życia niczego," +
+                " jak tylko, aby się zawsze układało w szereg szczęśliwych popołudni."));
+        spis_porad.add(new DefaultTip("Mann", "Nie pojmuję, jak można nie palić; kto nie pali, dobrowolnie pozbawia się," +
+                " że tak powiem, najlepszej cząstki życia, w każdym razie wielkiej przyjemności! Budząc się już się cieszę," +
+                " że w ciągu dnia będę mógł palić, a przy jedzeniu znów się na to cieszę, a nawet mogę powiedzieć,oczywiście z pewną przesadą" +
+                " — że jem tylko po to, aby później zapalić."));
+        JTipOfTheDay porada_dnia = new JTipOfTheDay(spis_porad);
+        for(int i = 0; i< rand.nextInt(100);i++) {
+            porada_dnia.nextTip();
+        }
+        porada_dnia.showDialog(null);
+    }
 
     public static void main(String args[])
     {
@@ -304,6 +333,7 @@ public class MyWindow extends JFrame implements ActionListener, Runnable {
         System.out.println("Start Aplikacji");
         MyWindow f = new MyWindow();
         f.setVisible(true);
+        tipOfTheDay();
     }
 
 }
